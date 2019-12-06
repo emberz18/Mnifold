@@ -1,0 +1,255 @@
+\documentclass[11pt,a4j]{jarticle}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+
+\newtheorem{dfn}{定義}
+\newtheorem{prop}{命題}
+\newtheorem{Proof}{証明}
+
+\title{多様体}
+\author{富田　直輝}
+
+\begin{document}
+\maketitle
+\section{はじめに}
+自身が研究で利用している手法である次元削減において非線形なデータを仮定して考える場合，
+概念として多様体の考えを用いて考えられる場合が多い．
+最新の機械学習を追っていくと距離の話や埋め込みの話など多様体について避けることはできないと思われる．
+また，最近では位相的データ解析が流行りつつある．
+そこで今回は前提知識として集合論や位相論を紹介(復習)した上で多様体について紹介していこうと思う．
+
+\section{集合(Set)}
+集合とはいくつかのものをひとまとめにして考えた'ものの集まりのこと'である．
+集合における$A$の最小の要素は元(element)と呼ぶ事にする．
+ここで多様体を導入する前の例として実数集合を$\mathbb{R}^n$を考える．
+$\mathbb{R}^n$は次の式によって定義される．
+\begin{eqnarray}
+    \label{eq:1}
+    \mathbb{R}^n=\{x_i | x_i \in  \mathbb{R}\}
+\end{eqnarray}
+ここで$n=1$であるなら直線として，$n=2$であるならば平面として表現されるのは既知である．
+
+次に実数集合$A$,$B$を考える．
+ここで$A$の各元$a$がBの部分集合$\Gamma(a)$によって定められるときに$\Gamma$のことを
+AからBの対応と呼ぶ．
+この対応による$\Gamma(a)$が$B$のただ一つの元によって成り立つ場合$A$から$B$への写像(mapping)であると呼ぶ．
+
+写像を考える上で，単射(injection)と全射(surjection)を定義しておきたい．
+全射は次で定義される．
+\begin{dfn}
+    $B$のどの元$b$に対して全ての$f^{-1}(b)\neq \emptyset $であるとき，つまり$f(a)=b$となるような$A$の元$a$が
+    少なくとも一つ存在する．
+\end{dfn}
+また，単射は次で定義される．
+\begin{dfn}
+        $a,a' \in A , a \neq a' \rightarrow f(a)\neq f(a')$
+\end{dfn}
+全射と単射の両方を満たす写像を全単射と呼ぶ．
+
+\section{距離(Metric)}
+位相空間を導入するために距離を考える．
+一般に考えられる距離は式(\ref{eq:6})で定義される．
+\begin{eqnarray}
+    \label{eq:6}
+    d(x,y)=\sqrt{\sum_{i=1}^n (x_i - y_i)^2}
+\end{eqnarray}
+ここで考える距離は次の性質を満たすものに限る．
+\begin{prop}
+    \label{pr:1}距離の性質
+    \begin{enumerate}
+        \renewcommand{\labelenumi}{(\roman{enumi})}
+        \item ${x,y \in \mathbb{R}^n} \rightarrow d(x,y) \geq 0$\label{pr1:1}
+        \item $x=y \rightarrow d(x,y)$\label{pr1:2}
+        \item $d(x,y)=d(y,x)$\label{pr1:3}
+        \item ${x,y,z \in \mathbb{R}^n} \rightarrow d(x,y) + d(y,z) \geq d(x,z)$\label{pr1:4}
+    \end{enumerate}
+\end{prop}
+命題\ref{pr:1}における\ref{pr1:4}は次のように証明される，
+\begin{Proof}
+    $x_i-y_i=a_i$，$y_i-z_i=b_i$とする．
+    このとき$x_i-z_i=a_i-b_i$であるのは明らかである．
+    したがって式$(\ref{eq:6})$を用いると次のように証明することができる．
+    \begin{eqnarray}
+        \label{eq:7}
+        \sqrt{\sum_{i=1}^n (a_i+b_i)^2}\leq \sqrt{\sum_{i=1}^n a_i^2} + \sqrt{\sum_{i=1}^n b_i^2}
+    \end{eqnarray}
+    式$(\ref{eq:7})$について両辺を$2$乗すると式$(\ref{eq:8})$を導出することができる．
+    \begin{eqnarray}
+        \sum_{i=1}^n a_i^2 + \sum_{i=1}^n a_i b_i + \sum_{i=1}^n b_i^2 & \leq & \sum_{i=1}^n a_i^2 + \sqrt{(\sum_{i=1}^n a_i^2)(\sum_{i=1}^n b_i^2)} + \sum_{i=1}^n b_i^2 \nonumber \\
+        \sum_{i=1}^n a_i b_i & \leq & \sqrt{(\sum_{i=1}^n a_i^2)(\sum_{i=1}^n b_i^2)}
+        \label{eq:8}
+    \end{eqnarray}
+    式$(\ref{eq:8})$の両辺について$2$乗すると，
+    \begin{eqnarray}
+        \label{eq:9}
+        (\sum_{i=1}^n a_i b_i)^2 & \leq & (\sum_{i=1}^n a_i^2)(\sum_{i=1}^n b_i^2)
+    \end{eqnarray}
+    式$(\ref{eq:9})$はCauchy-Schwarzの不等式の証明に帰する
+\end{Proof}
+
+
+\section{位相空間(Tpological space)} 
+$\mathbb{R}^n$における球体の概念を式(\ref{eq:2})の$B(a;\epsilon)$で定義する．
+\begin{eqnarray}
+    \label{eq:2}
+    B(a;\epsilon)=oo\{x|x\in \mathbb{R}^n,d(a,x)<\epsilon\}
+\end{eqnarray}
+式(\ref{eq:2})のおける$a$は中心，$\epsilon$は半径を示す．
+
+次に$M\subset \mathbb{R}$を考える．$\mathbb{R}^n$の点Aに対して次の式(\ref{eq:3})が成り立つとき，
+\begin{eqnarray}
+    \label{eq:3}
+    B(a;\epsilon) \subset M
+\end{eqnarray}
+$a$を$M$の内点と呼ぶ．
+このとき$M$の内点全部の集合を$M$の内部(interior)または開核(open kernel)と呼び，
+$M^i$で表される．
+
+$M$の$\mathbb{R}^n$に対する補集合の内点をMの外点とする．このとき，aを含む$B(a;\epsilon)$は
+全て$M$に属していない時に$M$の外部(exterior)といい，$M^e$とする．
+ここで$M^i \cup M^e = \emptyset$が成り立つのは既知である．
+
+$M$の内点でも外点でもない点を$M$の境界点と呼ぶ．
+$M$の境界点全部の集合$\mathbb{R}^n-(M^i \cup M^e)$を$M$の境界と呼び，
+$M^f$で表される．
+$M$に対して$M^i \cup M^f$を閉包(closure)または触集合(adherence)であると呼び，$\bar{M}$で表す．
+
+また，$M$と$M^i$が一致する場合はMを$n$次元空間$\mathbb{R}^n$の開集合であるとよぶ．
+$M$と$\bar{M}$が一致する場合は閉集合であると呼ぶ．
+
+$\mathbb{R}^n$からなる上記のような開集合全体の集合を$\mathfrak{o}(\mathbb{R}^n)$で
+表す．
+定義は\ref{pr:2}で表される．
+\begin{dfn}
+    開集合(open set)
+    \label{pr:2}
+    \begin{enumerate}
+        \renewcommand{\labelenumi}{(\roman{enumi})}
+        \item $\mathbb{R} \in \mathfrak{O}$，$\emptyset \in \mathfrak{O}$
+        \item $O_1,O_2,\cdots,O_k \in \mathfrak{O} \rightarrow O_1 \cap O_2 \cap \cdots \cap O_k \in \mathfrak{O} $
+        \item $\cup_{\lambda \in A} O_\lambda \in \mathfrak{O}$
+    \end{enumerate} 
+\end{dfn}
+閉集合においても同様な定義を行うことができるが今回は省略する．
+
+上記の開集合の定理を一般化したものを次に示す．
+\begin{dfn}
+    位相
+    \begin{enumerate}
+        \renewcommand{\labelenumi}{(\roman{enumi})}
+        \item $X \in \mathfrak{O}$，$\emptyset \in \mathfrak{O}$
+        \item $O_1,O_2,\cdots,O_k \in \mathfrak{O} \rightarrow O_1 \cap O_2 \cap \cdots \cap O_k \in \mathfrak{O} $
+        \item $\cup_{\lambda \in A} O_\lambda \in \mathfrak{O}$
+    \end{enumerate} 
+\end{dfn}
+Xはある集合系だと仮定する．
+位相空間は一般的に対$(X,\mathfrak{O})$という形で書かれる．
+
+\subsection{連続写像(continous map)}
+上記で位相を定義した．ここで話が戻るがある集合$U\in \mathbb{R}^n,V\in \mathbb{R}^m$を考よう．
+そして，この集合$U,V$が写像$f:U\rightarrow V$で表されるものを考えたとしよう．
+$x_n,a \in U $を前提すれば次の定義を与えることができる．
+\begin{dfn}
+   連続
+    \begin{eqnarray}
+        \lim_{n \rightarrow \inf} x_n=a \rightarrow \lim_{n \rightarrow \inf} f(x_n) = f(a)
+    \end{eqnarray} 
+\end{dfn}
+また，連続関数を次のように定義する．
+\begin{dfn}
+    連続写像
+
+    $U$の全ての点において連続であるとき，$f:U\rightarrow V$は連続写像である．
+\end{dfn}
+
+連続写像である場合は，次の定理が成り立つことが知られている．
+\begin{dfn}
+
+    fが連続であるためには任意の$U \in Y$に対して，$f^{-1}(U) \subset X$が開集合である．
+\end{dfn}
+
+
+話を位相空間内に戻そう．同様に連続写像においても定義することができる．
+\begin{dfn}
+    二つの位相空間$(X,\mathfrak{O})$，$(y,\mathfrak{O})$が存在し，$f:X \rightarrow Y$が連続写像であるためには
+    任意の$U \in Y$に対して，$f^{-1}(U) \subset X$が開集合である．
+\end{dfn}
+
+また，位相空間においては全単射も集合と同様に定義することができる．
+連続写像と全単射を満たすものを同相写像(homeomorphism)という．
+
+\subsection{近傍(neighborhood)}
+$(X,\mathfrak{O})$を$1$つの位相空間とする．$x$を$X$の$1$つの点とするとき，$V \subset X$が$x$の近傍であることは
+式(\ref{eq:5})が成り立つときである．
+\begin{eqnarray}
+    \label{eq:5}
+    x \in V^i
+\end{eqnarray}
+明らかに式(\ref{eq:11})が成り立つような開集合$O$が存在していることと同等である．
+\begin{eqnarray} 
+    \label{eq:11}
+    x \in O,O \subset V
+\end{eqnarray}
+
+
+\subsection{ハウスドルフ空間(Hausdorff space)}
+多様体を扱う上での概念の一つにハウスドルフ空間が存在する．
+ここでハウスドルフ空間における定義を与える．
+
+\begin{dfn}
+    \label{dfn:9}
+    ハウスドルフ空間を定義するためには次のハウスドルフの公理を満たさなければならない
+    \begin{eqnarray}
+        (x \not = y),\exists O_x,O_y \in \mathfrak{O},x \in O_x,y \in O_y ,O_x \cup O_y = \emptyset
+    \end{eqnarray}
+\end{dfn}
+
+つまり，$O_x,O_y$が互いに交わらない空間のみを扱いたいということである．
+
+\section{多様体(manifold)}
+ここまで来ればようやく多様体を定義することができる．
+多様体とは'$m$次元空間におけるまっすぐな空間や曲がった空間’を考えるためのツールである．
+厳密には位相多様体であるわけだが，その前に極座標の定義を与える．
+\begin{dfn}
+    \label{dfn:10}
+    位相空間$X$の開集合$U$から，$m$次元数空間における$\mathbb{R}^m$への同相写像が式(\ref{eq:4})で存在するとき，
+    $U$と次$(U,\varphi)$を$m$次元座標近傍(cordinate neighborhood)といい，$\varphi$を$U$上の曲座標系(local cordinate system)であるという．
+    \begin{eqnarray}
+        \label{eq:4}
+        \varphi:U \rightarrow U'
+    \end{eqnarray}
+\end{dfn}
+
+次に位相多様体を定義する．
+\begin{dfn}位相多様体(topologocal manifold)
+    
+    位相空間$M$が次を満たすとき，$M$は$m$次元位相多様体である．
+    \begin{enumerate}
+        \renewcommand{\labelenumi}{(\roman{enumi})}
+        \item $M$はハウスドルフ空間である．
+        \item $x \in M$について，$p$を含む$m$次元座標近傍$(U,\varphi)$が存在する．
+    \end{enumerate}
+\end{dfn}
+
+位相多様体を定義したところで開集合$U'$における$\varphi(p)$の表し方を考えてみよう．
+$p \in U$に対する$\varphi(p) \in U'$は$\mathbb{R}^m$の点であるので，$\mathbb{R}^m$$\mathbb{R}^m$の座標を用いると
+式(\ref{eq:10})で書くことができる．
+\begin{eqnarray}
+    \label{eq:10}
+    \varphi(p)=(x_1,x_2,\cdots,x_m)
+\end{eqnarray}
+
+\subsection{座標変換}
+$p \in U,p \in V,U \subset M,V \subset M$で表される位相空間を考える．
+$V,M$は座標変換を定義することで表すことができる．
+\begin{dfn}
+    座標変換(coordinate transformation)
+
+   同相写像$\psi \circ \varphi^{-1}:\varphi(U \cap V)\rightarrow\psi(U \cap V)$への座標変換と呼ぶ 
+\end{dfn}
+
+\begin{thebibliography}{2}
+    \bibitem{松坂}松坂 和夫，“数学入門シリーズ1　集合・位相入門”
+    \bibitem{松本}松本 幸生，“基礎数学5　多様体の基礎”
+\end{thebibliography}
+\end{document}
